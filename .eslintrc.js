@@ -2,7 +2,12 @@ module.exports = {
   root: true,
   extends: ['@react-native-community', 'prettier'],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'prettier', 'simple-import-sort'],
+  plugins: [
+    '@typescript-eslint',
+    'prettier',
+    'simple-import-sort',
+    'sort-keys-fix',
+  ],
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
@@ -18,6 +23,8 @@ module.exports = {
         ],
         'simple-import-sort/imports': 'error',
         'simple-import-sort/exports': 'error',
+        'sort-keys-fix/sort-keys-fix': 'warn',
+        'react/jsx-sort-props': 'error',
       },
     },
   ],

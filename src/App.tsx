@@ -1,13 +1,16 @@
+import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import Home from '@/pages/Home';
+import { MainRoute } from './routes/Routes';
 
 const App = () => {
   return (
-    <PaperProvider>
-      <Home />
-    </PaperProvider>
+    <NavigationContainer>
+      <PaperProvider>
+        <MainRoute />
+      </PaperProvider>
+    </NavigationContainer>
   );
 };
 
