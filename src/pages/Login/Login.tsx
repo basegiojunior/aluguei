@@ -1,15 +1,41 @@
+import auth from '@react-native-firebase/auth';
 import React from 'react';
-import { Button } from 'react-native-paper';
+import { ActivityIndicator, Button } from 'react-native-paper';
 
-import { useCustomNavigation } from '@/routes/Routes.hooks';
-import { RoutesList } from '@/routes/Routes.types';
+import { useUserContext } from '@/contexts/UserContext';
 
 export const Login: React.FC = () => {
-  const { navigate } = useCustomNavigation();
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const { setUser } = useUserContext();
+
+  async function signIn() {
+    try {
+      setLoading(true);
+      const response = await auth().signInWithEmailAndPassword(
+        'basegiojunior@gmail.com',
+        '.Ms12al15.',
+      );
+
+      if (response.user.email && response.user.uid) {
+        setUser({
+          email: response.user.email,
+          id: response.user.uid,
+          name: response.user.displayName,
+        });
+      } else {
+        throw new Error("Couldn't get user data");
+      }
+    } catch {
+      setLoading(false);
+    }
+  }
 
   return (
-    <Button mode="contained" onPress={() => navigate(RoutesList.Home)}>
-      Login
-    </Button>
+    <>
+      <Button mode="contained" onPress={() => signIn()}>
+        Entrar
+      </Button>
+      <ActivityIndicator animating={loading} />
+    </>
   );
 };
