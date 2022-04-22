@@ -21,7 +21,7 @@ export const Home: React.FC = () => {
 
   return (
     <View>
-      <Button mode="contained" onPress={() => signOut()}>
+      <Button mode="contained" onPress={() => signOut()} testID="logout-button">
         Log out
       </Button>
 

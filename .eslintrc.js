@@ -7,10 +7,11 @@ module.exports = {
     'prettier',
     'simple-import-sort',
     'sort-keys-fix',
+    'detox',
   ],
   overrides: [
     {
-      files: ['*.ts', '*.tsx'],
+      files: ['*.ts', '*.tsx', '*.e2e.js'],
       rules: {
         '@typescript-eslint/no-shadow': ['error'],
         'no-shadow': 'off',
@@ -25,6 +26,11 @@ module.exports = {
         'simple-import-sort/exports': 'error',
         'sort-keys-fix/sort-keys-fix': 'warn',
         'react/jsx-sort-props': 'error',
+      },
+      env: {
+        jest: true,
+        'detox/detox': true,
+        'jest/globals': true,
       },
     },
   ],
