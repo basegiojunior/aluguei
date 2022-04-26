@@ -9,37 +9,33 @@ import {
   useTheme,
 } from 'react-native-paper';
 
-import { useUserContext } from '@/contexts/UserContext';
 import { useCustomNavigation } from '@/routes/Routes.hooks';
 import { RoutesList } from '@/routes/Routes.types';
 import customComponentStyles from '@/styles/customComponents';
 import spacingStyles from '@/styles/spacing';
 
-import { styles } from './Login.styles';
+import { styles } from './Register.styles';
 
-export const Login: React.FC = () => {
-  const { setUser } = useUserContext();
-  const { colors } = useTheme();
+export const Register: React.FC = () => {
   const { navigate } = useCustomNavigation();
+  const { colors } = useTheme();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  async function signIn() {
+  async function signUp() {
     try {
       setLoading(true);
-      const response = await auth().signInWithEmailAndPassword(email, password);
+      const response = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
 
       if (response.user.email && response.user.uid) {
-        setUser({
-          email: response.user.email,
-          id: response.user.uid,
-          name: response.user.displayName,
-        });
-      } else {
-        throw new Error("Couldn't get user data");
+        navigate(RoutesList.Login);
       }
     } catch {
       setLoading(false);
@@ -48,15 +44,15 @@ export const Login: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Headline style={styles.title}>Entrar</Headline>
+      <Headline style={styles.title}>Cadastrar</Headline>
       <TextInput
         autoComplete="email"
         keyboardType="email-address"
-        label="E-mail"
+        label="Email"
         left={<TextInput.Icon name="email" />}
         onChangeText={setEmail}
         style={spacingStyles.bottomDefaultSpace}
-        testID="email-input"
+        testID="register-email-input"
         value={email}
       />
       <TextInput
@@ -72,33 +68,43 @@ export const Login: React.FC = () => {
         }
         secureTextEntry={!showPassword}
         style={spacingStyles.bottomDefaultSpace}
-        testID="password-input"
+        testID="register-password-input"
         value={password}
+      />
+      <TextInput
+        autoComplete="password"
+        label="Confirme a senha"
+        left={<TextInput.Icon name="key" />}
+        onChangeText={setConfirmPassword}
+        right={
+          <TextInput.Icon
+            name={showPassword ? 'eye' : 'eye-off'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
+        secureTextEntry={!showPassword}
+        style={spacingStyles.bottomDefaultSpace}
+        testID="register-confirm-password-input"
+        value={confirmPassword}
       />
       <Button
         contentStyle={customComponentStyles.buttonDefault}
         loading={loading}
         mode="contained"
-        onPress={() => signIn()}
+        onPress={() => signUp()}
         style={spacingStyles.bottomDefaultSpace}
         testID="login-button">
         {loading ? '' : 'Entrar'}
       </Button>
 
-      <Pressable style={styles.forgotPasswordText}>
-        <Subheading style={{ color: colors.primary }}>
-          Esqueci a senha
-        </Subheading>
-      </Pressable>
-
       <Pressable
-        onPress={() => navigate(RoutesList.Register)}
+        onPress={() => navigate(RoutesList.Login)}
         style={styles.registerTextButton}>
         <Subheading>
           <>
-            Novo no Aluguei?{' '}
+            Já tem cadastro?{' '}
             <Subheading style={{ color: colors.primary }}>
-              Cadastre-se
+              Entre aqui
             </Subheading>
           </>
         </Subheading>
