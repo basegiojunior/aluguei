@@ -4,6 +4,7 @@ import React from 'react';
 
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
+import ResetPassword from '@/pages/ResetPassword';
 
 import { RoutesList } from './Routes.types';
 
@@ -20,7 +21,12 @@ export const AuthRoute = () => {
       <AuthStack.Screen
         component={Register}
         name={RoutesList.Register}
-        options={{ headerShown: false }}
+        options={{ headerTransparent: true, title: '' }}
+      />
+      <AuthStack.Screen
+        component={ResetPassword}
+        name={RoutesList.ResetPassword}
+        options={{ headerTransparent: true, title: '' }}
       />
     </AuthStack.Navigator>
   );

@@ -77,6 +77,7 @@ export const Login: React.FC = () => {
       />
       <Button
         contentStyle={customComponentStyles.buttonDefault}
+        disabled={!email || !password}
         loading={loading}
         mode="contained"
         onPress={() => signIn()}
@@ -85,7 +86,9 @@ export const Login: React.FC = () => {
         {loading ? '' : 'Entrar'}
       </Button>
 
-      <Pressable style={styles.forgotPasswordText}>
+      <Pressable
+        onPress={() => navigate(RoutesList.ResetPassword)}
+        style={styles.forgotPasswordText}>
         <Subheading style={{ color: colors.primary }}>
           Esqueci a senha
         </Subheading>
