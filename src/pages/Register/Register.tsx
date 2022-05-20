@@ -1,6 +1,6 @@
 import auth from '@react-native-firebase/auth';
 import React, { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Keyboard, Pressable, View } from 'react-native';
 import {
   Button,
   Headline,
@@ -11,6 +11,7 @@ import {
 } from 'react-native-paper';
 import { ValidationError } from 'yup';
 
+import SimpleAlert from '@/components/SimpleAlert';
 import { useCustomNavigation } from '@/routes/Routes.hooks';
 import { RoutesList } from '@/routes/Routes.types';
 import customComponentStyles from '@/styles/customComponents';
@@ -39,14 +40,31 @@ export const Register: React.FC = () => {
     password: undefined,
     passwordConfirm: undefined,
   });
+  const [showInternetErrorDialog, setShowInternetErrorDialog] = useState(false);
+  const [showEmailInUseErrorDialog, setShowEmailInUseErrorDialog] =
+    useState(false);
+  const [showGeneralErrorDialog, setShowGeneralErrorDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   async function signUp() {
     try {
       setLoading(true);
-      await auth().createUserWithEmailAndPassword(email, password);
+      const response = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+      response.user.sendEmailVerification();
 
-      navigate(RoutesList.Login);
-    } catch {
+      setShowSuccessDialog(true);
+    } catch (error: any) {
+      if (error.code === 'auth/network-request-failed') {
+        setShowInternetErrorDialog(true);
+      } else if (error.code === 'auth/email-already-in-use') {
+        setShowEmailInUseErrorDialog(true);
+      } else {
+        setShowGeneralErrorDialog(true);
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -137,15 +155,19 @@ export const Register: React.FC = () => {
       )}
       <Button
         contentStyle={customComponentStyles.buttonDefault}
+        disabled={loading}
         loading={loading}
         mode="contained"
         onPress={() => validateForm()}
         style={spacingStyles.bottomDefaultSpace}
-        testID="login-button">
+        testID="register-button">
         {loading ? '' : 'Cadastrar'}
       </Button>
 
-      <Pressable onPress={goBack} style={styles.registerTextButton}>
+      <Pressable
+        onPress={goBack}
+        style={styles.registerTextButton}
+        testID="navigate-back-to-login">
         <Subheading>
           <>
             Já tem cadastro?{' '}
@@ -155,6 +177,43 @@ export const Register: React.FC = () => {
           </>
         </Subheading>
       </Pressable>
+
+      <SimpleAlert
+        content="Não foi possível realizar o cadastro, tente novamente"
+        onClose={() => setShowGeneralErrorDialog(false)}
+        title="Erro"
+        visible={showGeneralErrorDialog}
+      />
+
+      <SimpleAlert
+        content="Não foi possível realizar o cadastro, verifique sua conexão com a internet"
+        onClose={() => setShowInternetErrorDialog(false)}
+        title="Erro de conexão"
+        visible={showInternetErrorDialog}
+      />
+
+      <SimpleAlert
+        content="Esse email já está em uso"
+        onClose={() => {
+          setShowEmailInUseErrorDialog(false);
+          Keyboard.dismiss();
+        }}
+        testIDOkButton="register-email-in-use-error-ok-button"
+        title="Erro"
+        visible={showEmailInUseErrorDialog}
+      />
+
+      <SimpleAlert
+        content="Cadastro realizado com sucesso, verifique seu email para ativar sua conta"
+        onClose={() => {
+          setShowSuccessDialog(false);
+
+          navigate(RoutesList.Login);
+        }}
+        testIDOkButton="register-success-button"
+        title="Sucesso"
+        visible={showSuccessDialog}
+      />
     </View>
   );
 };
