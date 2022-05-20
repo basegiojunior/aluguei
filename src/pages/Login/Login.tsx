@@ -9,7 +9,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 
-import SimpleAlert from '@/components/SimpleAlert';
+import { useAlertContext } from '@/contexts/AlertContext';
 import { useUserContext } from '@/contexts/UserContext';
 import { useCustomNavigation } from '@/routes/Routes.hooks';
 import { RoutesList } from '@/routes/Routes.types';
@@ -22,17 +22,20 @@ export const Login: React.FC = () => {
   const { setUser } = useUserContext();
   const { colors } = useTheme();
   const { navigate } = useCustomNavigation();
+  const { showAlert } = useAlertContext();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showInternetErrorDialog, setShowInternetErrorDialog] =
-    useState<boolean>(false);
-  const [showLoginErrorDialog, setShowLoginErrorDialog] =
-    useState<boolean>(false);
-  const [showNoVerifiedDialog, setShowNoVerifiedDialog] =
-    useState<boolean>(false);
+
+  function showLoginErrorDialog() {
+    showAlert({
+      content: 'Email ou senha incorretos, tente novamente',
+      testIDOkButton: 'login-wrong-credentials-dialog-button',
+      title: 'Erro ao entrar',
+    });
+  }
 
   async function signIn() {
     try {
@@ -40,7 +43,11 @@ export const Login: React.FC = () => {
       const response = await auth().signInWithEmailAndPassword(email, password);
 
       if (!response.user.emailVerified) {
-        setShowNoVerifiedDialog(true);
+        showAlert({
+          content: 'Confirme seu e-mail para poder acessar o aplicativo',
+          testIDOkButton: 'login-no-verified-dialog-button',
+          title: 'Erro ao entrar',
+        });
       } else if (response.user.email && response.user.uid) {
         setUser({
           email: response.user.email,
@@ -48,7 +55,7 @@ export const Login: React.FC = () => {
           name: response.user.displayName,
         });
       } else {
-        setShowLoginErrorDialog(true);
+        showLoginErrorDialog();
       }
     } catch (error: any) {
       if (
@@ -56,9 +63,13 @@ export const Login: React.FC = () => {
         error.code === 'auth/invalid-email' ||
         error.code === 'auth/wrong-password'
       ) {
-        setShowLoginErrorDialog(true);
+        showLoginErrorDialog();
       } else if (error.code === 'auth/network-request-failed') {
-        setShowInternetErrorDialog(true);
+        showAlert({
+          content:
+            'Não foi possível se conectar, verifique se você está conectado à internet',
+          title: 'Erro de conexão',
+        });
       }
     } finally {
       setLoading(false);
@@ -127,29 +138,6 @@ export const Login: React.FC = () => {
           </>
         </Subheading>
       </Pressable>
-
-      <SimpleAlert
-        content="Não foi possível se conectar, verifique se você está conectado à internet"
-        onClose={() => setShowInternetErrorDialog(false)}
-        title="Erro de conexão"
-        visible={showInternetErrorDialog}
-      />
-
-      <SimpleAlert
-        content="Email ou senha incorretos, tente novamente"
-        onClose={() => setShowLoginErrorDialog(false)}
-        testIDOkButton="login-wrong-credentials-dialog-button"
-        title="Erro ao entrar"
-        visible={showLoginErrorDialog}
-      />
-
-      <SimpleAlert
-        content="Confirme seu e-mail para poder acessar o aplicativo"
-        onClose={() => setShowNoVerifiedDialog(false)}
-        testIDOkButton="login-no-verified-dialog-button"
-        title="Erro ao entrar"
-        visible={showNoVerifiedDialog}
-      />
     </View>
   );
 };

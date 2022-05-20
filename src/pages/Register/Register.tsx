@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import { ValidationError } from 'yup';
 
-import SimpleAlert from '@/components/SimpleAlert';
+import { useAlertContext } from '@/contexts/AlertContext';
 import { useCustomNavigation } from '@/routes/Routes.hooks';
 import { RoutesList } from '@/routes/Routes.types';
 import customComponentStyles from '@/styles/customComponents';
@@ -28,6 +28,7 @@ type FieldValidation = {
 
 export const Register: React.FC = () => {
   const { navigate, goBack } = useCustomNavigation();
+  const { showAlert } = useAlertContext();
   const { colors } = useTheme();
 
   const [loading, setLoading] = useState(false);
@@ -40,11 +41,6 @@ export const Register: React.FC = () => {
     password: undefined,
     passwordConfirm: undefined,
   });
-  const [showInternetErrorDialog, setShowInternetErrorDialog] = useState(false);
-  const [showEmailInUseErrorDialog, setShowEmailInUseErrorDialog] =
-    useState(false);
-  const [showGeneralErrorDialog, setShowGeneralErrorDialog] = useState(false);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   async function signUp() {
     try {
@@ -55,14 +51,32 @@ export const Register: React.FC = () => {
       );
       response.user.sendEmailVerification();
 
-      setShowSuccessDialog(true);
+      showAlert({
+        content:
+          'Cadastro realizado com sucesso, verifique seu email para ativar sua conta',
+        onClose: () => navigate(RoutesList.Login),
+        testIDOkButton: 'register-success-button',
+        title: 'Sucesso',
+      });
     } catch (error: any) {
       if (error.code === 'auth/network-request-failed') {
-        setShowInternetErrorDialog(true);
+        showAlert({
+          content:
+            'Não foi possível realizar o cadastro, verifique sua conexão com a internet',
+          title: 'Erro de conexão',
+        });
       } else if (error.code === 'auth/email-already-in-use') {
-        setShowEmailInUseErrorDialog(true);
+        showAlert({
+          content: 'Esse email já está em uso',
+          onClose: () => Keyboard.dismiss(),
+          testIDOkButton: 'register-email-in-use-error-ok-button',
+          title: 'Erro',
+        });
       } else {
-        setShowGeneralErrorDialog(true);
+        showAlert({
+          content: 'Não foi possível realizar o cadastro, tente novamente',
+          title: 'Erro',
+        });
       }
     } finally {
       setLoading(false);
@@ -177,43 +191,6 @@ export const Register: React.FC = () => {
           </>
         </Subheading>
       </Pressable>
-
-      <SimpleAlert
-        content="Não foi possível realizar o cadastro, tente novamente"
-        onClose={() => setShowGeneralErrorDialog(false)}
-        title="Erro"
-        visible={showGeneralErrorDialog}
-      />
-
-      <SimpleAlert
-        content="Não foi possível realizar o cadastro, verifique sua conexão com a internet"
-        onClose={() => setShowInternetErrorDialog(false)}
-        title="Erro de conexão"
-        visible={showInternetErrorDialog}
-      />
-
-      <SimpleAlert
-        content="Esse email já está em uso"
-        onClose={() => {
-          setShowEmailInUseErrorDialog(false);
-          Keyboard.dismiss();
-        }}
-        testIDOkButton="register-email-in-use-error-ok-button"
-        title="Erro"
-        visible={showEmailInUseErrorDialog}
-      />
-
-      <SimpleAlert
-        content="Cadastro realizado com sucesso, verifique seu email para ativar sua conta"
-        onClose={() => {
-          setShowSuccessDialog(false);
-
-          navigate(RoutesList.Login);
-        }}
-        testIDOkButton="register-success-button"
-        title="Sucesso"
-        visible={showSuccessDialog}
-      />
     </View>
   );
 };
