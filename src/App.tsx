@@ -1,9 +1,12 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
+import { enableLatestRenderer } from 'react-native-maps';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 
 import GlobalContext from './contexts';
 import { MainRoute } from './routes/Routes';
+
+enableLatestRenderer();
 
 const App = () => {
   return (

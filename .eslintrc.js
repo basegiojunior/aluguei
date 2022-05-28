@@ -26,6 +26,7 @@ module.exports = {
         'simple-import-sort/exports': 'error',
         'sort-keys-fix/sort-keys-fix': 'warn',
         'react/jsx-sort-props': 'error',
+        'react-hooks/exhaustive-deps': 'off',
       },
       env: {
         jest: true,
