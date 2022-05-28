@@ -5,6 +5,8 @@ import { ActivityIndicator, Button } from 'react-native-paper';
 
 import { useUserContext } from '@/contexts/UserContext';
 
+import styles from './Home.styles';
+
 export const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { setUser } = useUserContext();
@@ -20,7 +22,7 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Button mode="contained" onPress={() => signOut()} testID="logout-button">
         Log out
       </Button>
