@@ -1,31 +1,17 @@
-import auth from '@react-native-firebase/auth';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { PermissionsAndroid, View } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import MapView from 'react-native-maps';
-import { ActivityIndicator, Button } from 'react-native-paper';
+import { Appbar, TextInput } from 'react-native-paper';
 
 import { useAlertContext } from '@/contexts/AlertContext';
-import { useUserContext } from '@/contexts/UserContext';
 
-import styles from './Home.styles';
+import styles, { HeaderTheme } from './Search.styles';
 
-export const Home: React.FC = () => {
-  const { setUser } = useUserContext();
+export const Search: React.FC = () => {
   const { showAlert } = useAlertContext();
 
-  const [loading, setLoading] = useState<boolean>(false);
   const mapRef = useRef<MapView>(null);
-
-  async function signOut() {
-    try {
-      setLoading(true);
-      await auth().signOut();
-      setUser(null);
-    } catch {
-      setLoading(false);
-    }
-  }
 
   async function requestLocationPermission() {
     try {
@@ -72,13 +58,17 @@ export const Home: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Appbar.Header style={styles.header}>
+        <TextInput
+          left={<TextInput.Icon color="#fff" name="magnify" />}
+          mode="outlined"
+          placeholder="Buscar Cidade, Bairro, Rua, etc..."
+          right={<TextInput.Icon color="#fff" name="filter" />}
+          style={styles.headerInput}
+          theme={HeaderTheme}
+        />
+      </Appbar.Header>
       <MapView ref={mapRef} showsUserLocation style={styles.mapContainer} />
-
-      <Button mode="contained" onPress={() => signOut()} testID="logout-button">
-        Log out
-      </Button>
-
-      <ActivityIndicator animating={loading} />
     </View>
   );
 };

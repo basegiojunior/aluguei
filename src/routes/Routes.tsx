@@ -3,9 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 
 import { useUserContext } from '@/contexts/UserContext';
-import Home from '@/pages/Home';
 
 import { AuthRoute } from './Routes.auth';
+import BototmNavigationRoute from './Routes.bottomNavigation';
 
 const MainStack = createNativeStackNavigator();
 
@@ -18,7 +18,11 @@ export const MainRoute = () => {
 
   return (
     <MainStack.Navigator>
-      <MainStack.Screen component={Home} name="Home" />
+      <MainStack.Screen
+        component={BototmNavigationRoute}
+        name="BottomNavigationRoute"
+        options={{ headerShown: false }}
+      />
     </MainStack.Navigator>
   );
 };
