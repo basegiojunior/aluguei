@@ -1,15 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { DarkTheme } from 'react-native-paper';
-import { Theme } from 'react-native-paper/lib/typescript/types';
-
-export const HeaderTheme: Theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    placeholder: '#eee',
-    primary: '#fff',
-  },
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -22,7 +11,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
   },
-  headerInput: { backgroundColor: 'transparent', flex: 1 },
+  headerInput: { flex: 1 },
   mapContainer: {
     flex: 1,
   },

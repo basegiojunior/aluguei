@@ -6,10 +6,13 @@ import { Appbar, TextInput } from 'react-native-paper';
 
 import { useAlertContext } from '@/contexts/AlertContext';
 
-import styles, { HeaderTheme } from './Search.styles';
+import Filter from './components/Filter';
+import styles from './Search.styles';
 
 export const Search: React.FC = () => {
   const { showAlert } = useAlertContext();
+
+  const [filterVisible, setFilterVisible] = React.useState(false);
 
   const mapRef = useRef<MapView>(null);
 
@@ -60,15 +63,24 @@ export const Search: React.FC = () => {
     <View style={styles.container}>
       <Appbar.Header style={styles.header}>
         <TextInput
-          left={<TextInput.Icon color="#fff" name="magnify" />}
+          left={<TextInput.Icon name="magnify" />}
           mode="outlined"
           placeholder="Buscar Cidade, Bairro, Rua, etc..."
-          right={<TextInput.Icon color="#fff" name="filter" />}
+          right={
+            <TextInput.Icon
+              forceTextInputFocus={false}
+              name="filter"
+              onPress={() => setFilterVisible(true)}
+            />
+          }
           style={styles.headerInput}
-          theme={HeaderTheme}
         />
       </Appbar.Header>
       <MapView ref={mapRef} showsUserLocation style={styles.mapContainer} />
+      <Filter
+        onDimiss={() => setFilterVisible(false)}
+        visible={filterVisible}
+      />
     </View>
   );
 };
