@@ -6,6 +6,19 @@ type StyleType = {
 
 const styles = ({ borderRadius }: StyleType) =>
   StyleSheet.create({
+    alignRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+    },
+    footerContainer: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      paddingTop: 16,
+    },
+    justifyContentBetween: {
+      justifyContent: 'space-between',
+    },
     modalContainer: {
       backgroundColor: '#fff',
       borderRadius,
@@ -18,11 +31,6 @@ const styles = ({ borderRadius }: StyleType) =>
     },
     priceInput: {
       flex: 1,
-    },
-    priceRow: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      marginTop: 8,
     },
     priceText: {
       padding: 16,
