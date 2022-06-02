@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, TextInput as NativeTextInput, View } from 'react-native';
 import {
   Button,
   List,
@@ -39,9 +39,7 @@ export const Filter: React.FC<FilterProps> = ({ visible, onDimiss }) => {
   }
 
   function onChangeMin(newValue: string) {
-    console.log('before', newValue);
     const newValueOnlyNumbers = removeNonNumbers(newValue);
-    console.log('after', newValueOnlyNumbers);
     setMin(newValueOnlyNumbers);
   }
 
@@ -61,21 +59,33 @@ export const Filter: React.FC<FilterProps> = ({ visible, onDimiss }) => {
         <List.Section>
           <View style={filterStyle.alignRow}>
             <TextInput
+              dense
               label="Mínimo"
               left={<TextInput.Affix text="R$ " />}
-              onChangeText={onChangeMin}
+              render={props => (
+                <NativeTextInput
+                  {...props}
+                  onChangeText={onChangeMin}
+                  value={min}
+                />
+              )}
               right={<TextInput.Affix text=",00" />}
               style={filterStyle.priceInput}
-              value={min}
             />
             <Text style={filterStyle.priceText}>e</Text>
             <TextInput
+              dense
               label="Máximo"
               left={<TextInput.Affix text="R$ " />}
-              onChangeText={onChangeMax}
+              render={props => (
+                <NativeTextInput
+                  {...props}
+                  onChangeText={onChangeMax}
+                  value={max}
+                />
+              )}
               right={<TextInput.Affix text=",00" />}
               style={filterStyle.priceInput}
-              value={max}
             />
           </View>
         </List.Section>
@@ -97,7 +107,9 @@ export const Filter: React.FC<FilterProps> = ({ visible, onDimiss }) => {
           <Button color={colors.error} mode="text" onPress={onDimiss}>
             Cancelar
           </Button>
-          <Button mode="text">Aplicar</Button>
+          <Button mode="text" onPress={onDimiss}>
+            Aplicar
+          </Button>
         </View>
       </ScrollView>
     </Modal>

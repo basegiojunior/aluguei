@@ -25,6 +25,7 @@ export const ToggleList: React.FC<ToggleListProps> = ({
                   value === option.value ? colors.surface : colors.onSurface
                 }
                 icon={option.icon}
+                key={option.value}
                 size={28}
                 style={[
                   styles.toggle,
