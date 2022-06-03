@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { PermissionsAndroid, View } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import MapView from 'react-native-maps';
-import { Appbar, TextInput } from 'react-native-paper';
+import MapView, { Marker } from 'react-native-maps';
+import { Appbar, Chip, TextInput } from 'react-native-paper';
 
 import { useAlertContext } from '@/contexts/AlertContext';
+import { getRestsPerLocationAndRadius } from '@/firebase/getRestsPerLocationAndRadius';
+import { Rest } from '@/model/Rest.types';
 
 import Filter from './components/Filter';
 import styles from './Search.styles';
@@ -13,6 +15,10 @@ export const Search: React.FC = () => {
   const { showAlert } = useAlertContext();
 
   const [filterVisible, setFilterVisible] = React.useState(false);
+  const [currentPosition, setCurrentPosition] = React.useState<
+    { latitude: number; longitude: number } | undefined
+  >();
+  const [rests, setRests] = React.useState<Rest[]>([]);
 
   const mapRef = useRef<MapView>(null);
 
@@ -55,9 +61,25 @@ export const Search: React.FC = () => {
     }
   }
 
+  async function getRests() {
+    if (currentPosition) {
+      const restsResponse = await getRestsPerLocationAndRadius({
+        lat: currentPosition.latitude,
+        lng: currentPosition.longitude,
+        radiusInKm: 6,
+      });
+
+      setRests(restsResponse);
+    }
+  }
+
   useEffect(() => {
     requestLocationPermission();
   }, []);
+
+  useEffect(() => {
+    getRests();
+  }, [currentPosition]);
 
   return (
     <View style={styles.container}>
@@ -76,7 +98,27 @@ export const Search: React.FC = () => {
           style={styles.headerInput}
         />
       </Appbar.Header>
-      <MapView ref={mapRef} showsUserLocation style={styles.mapContainer} />
+      <MapView
+        onRegionChangeComplete={region => {
+          setCurrentPosition({
+            latitude: region.latitude,
+            longitude: region.longitude,
+          });
+        }}
+        ref={mapRef}
+        showsUserLocation
+        style={styles.mapContainer}>
+        {rests.map(rest => (
+          <Marker
+            coordinate={{
+              latitude: parseFloat(rest.location.latitude),
+              longitude: parseFloat(rest.location.longitude),
+            }}
+            key={rest.geohash}>
+            <Chip mode="outlined">{rest.price}</Chip>
+          </Marker>
+        ))}
+      </MapView>
       <Filter
         onDimiss={() => setFilterVisible(false)}
         visible={filterVisible}
