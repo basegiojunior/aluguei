@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { PermissionsAndroid, View } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import { Appbar, Chip, TextInput } from 'react-native-paper';
 
 import { useAlertContext } from '@/contexts/AlertContext';
@@ -15,9 +15,7 @@ export const Search: React.FC = () => {
   const { showAlert } = useAlertContext();
 
   const [filterVisible, setFilterVisible] = React.useState(false);
-  const [currentPosition, setCurrentPosition] = React.useState<
-    { latitude: number; longitude: number } | undefined
-  >();
+  const [region, setRegion] = React.useState<Region | undefined>();
   const [rests, setRests] = React.useState<Rest[]>([]);
 
   const mapRef = useRef<MapView>(null);
@@ -62,11 +60,11 @@ export const Search: React.FC = () => {
   }
 
   async function getRests() {
-    if (currentPosition) {
+    if (region) {
       const restsResponse = await getRestsPerLocationAndRadius({
-        lat: currentPosition.latitude,
-        lng: currentPosition.longitude,
-        radiusInKm: 6,
+        lat: region.latitude,
+        lng: region.longitude,
+        radiusInKm: region.latitudeDelta * 111,
       });
 
       setRests(restsResponse);
@@ -79,7 +77,7 @@ export const Search: React.FC = () => {
 
   useEffect(() => {
     getRests();
-  }, [currentPosition]);
+  }, [region]);
 
   return (
     <View style={styles.container}>
@@ -99,12 +97,7 @@ export const Search: React.FC = () => {
         />
       </Appbar.Header>
       <MapView
-        onRegionChangeComplete={region => {
-          setCurrentPosition({
-            latitude: region.latitude,
-            longitude: region.longitude,
-          });
-        }}
+        onRegionChangeComplete={setRegion}
         ref={mapRef}
         showsUserLocation
         style={styles.mapContainer}>

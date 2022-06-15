@@ -14,13 +14,9 @@ export async function getRestsPerLocationAndRadius({
   lng: number;
   radiusInKm: number;
 }): Promise<Rest[]> {
-  // let response: Rest[];
   const center = [lat, lng];
   const radiusInM = radiusInKm * 1000;
 
-  // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
-  // a separate query for each pair. There can be up to 9 pairs of bounds
-  // depending on overlap, but in most cases there are 4.
   const boundList = geofire.geohashQueryBounds(center, radiusInM);
   const promises = [];
   for (const bound of boundList) {
@@ -34,17 +30,12 @@ export async function getRestsPerLocationAndRadius({
   }
 
   try {
-    // Collect all the query results together into a single list
     const snapshots = await Promise.all(promises);
-    // .then(snapshots => {
     const matchingDocs = [];
 
     for (const snap of snapshots) {
       for (const doc of snap.docs) {
         const location: FirebaseFirestoreTypes.GeoPoint = doc.get('location');
-
-        // We have to filter out a few false positives due to GeoHash
-        // accuracy, but most will match
         const distanceInKm = geofire.distanceBetween(
           [location.latitude, location.longitude],
           center,
@@ -54,6 +45,11 @@ export async function getRestsPerLocationAndRadius({
           matchingDocs.push(doc.data());
         }
       }
+    }
+
+    while (matchingDocs.length > 10) {
+      const selectedIndex = Math.floor(Math.random() * matchingDocs.length);
+      matchingDocs.splice(selectedIndex, 1);
     }
 
     return matchingDocs as Rest[];
