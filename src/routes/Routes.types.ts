@@ -1,14 +1,14 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export enum RoutesList {
-  Home = 'Home',
+  BottomNavigationRoute = 'BottomNavigationRoute',
   Login = 'Login',
   Register = 'Register',
   ResetPassword = 'ResetPassword',
 }
 
 export type MainParamList = {
-  [RoutesList.Home]: undefined;
+  [RoutesList.BottomNavigationRoute]: undefined;
   [RoutesList.Register]: undefined;
   [RoutesList.Login]: undefined;
   [RoutesList.ResetPassword]: undefined;
